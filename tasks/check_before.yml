@@ -1,0 +1,34 @@
+---
+# not check `COMPLIANCE020201` by ansible-lint
+# Check if SqlServer is already installed
+  - name: Check SqlServer Instance Already Exists
+    win_reg_stat:
+      path: "HKLM:\\Software\\Microsoft\\Microsoft SQL Server"
+      name: InstalledInstances
+    register: SQLInstance_regedit
+
+  - name: Set SqlServer Instance Status Flag
+    set_fact: SQLInstance_state=false
+
+  - name: failed when sqlserver already install
+    block:
+
+    - name: Fail when Exists
+      fail:
+        msg: "{{ VAR_INSTANCENAME }} is already installed"
+      when:
+        - not VAR_AllowSkip_SQLServerSWExist
+        - VAR_INSTANCENAME in SQLInstance_regedit.value
+
+    - name: Set SqlServer Instance Status Flag
+      set_fact: SQLInstance_state=true
+      when:
+        - VAR_INSTANCENAME in SQLInstance_regedit.value
+
+    when: SQLInstance_regedit.exists
+
+# Run install playbook
+  - name: Run Playbook
+    import_tasks: install.yml
+    when: not SQLInstance_state
+

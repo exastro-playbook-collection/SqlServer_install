@@ -1,0 +1,48 @@
+---
+# not check `COMPLIANCE020201` by ansible-lint
+# Create direcory for respose file
+  - name: Create Configure.ini File Directory
+    win_file:
+      path: "{{ VAR_INI_Path }}"
+      state: directory
+
+# copy the response file for install
+  - name: Copy ConfigurationFile
+    win_template:
+      src: ConfigurationFile.ini.j2
+      dest: "{{ VAR_INI_Path }}\\ConfigurationFile.ini"
+
+  - name: check the type of sql
+    block:
+    - name: Installer_name
+      register: Installer_Name
+      set_fact: Installer_Name = "{{ item }}"
+      when: '".exe" in item'
+      with_items:
+        - "{{ VAR_Installer_Name }}"
+    when: VAR_Installer_Type == "CMP"
+
+# execute check shell
+  - name: Run Installer by Default Path
+    raw: chcp {{ OS_Language_Code }}; {{ SQLServer_image_out_path }}\setup.exe /CONFIGURATIONFILE='{{ VAR_INI_Path }}\ConfigurationFile.ini' {{ VAR_Extra_Command }}
+    when:
+      - SQLServer_image_out_path is defined
+
+  - name: Run CMP Installer by Specified Path
+    raw: chcp {{ OS_Language_Code }}; {{ VAR_Installer_Unzip_Path }}\setup.exe /CONFIGURATIONFILE='{{ VAR_INI_Path }}\ConfigurationFile.ini' {{ VAR_Extra_Command }}
+    when:
+      - SQLServer_image_out_path is not defined
+      - VAR_Installer_Type == "CMP"
+
+
+  - name: Run Installer by Specified Path
+    raw: chcp {{ OS_Language_Code }}; {{ VAR_Installer_Unzip_Path }}\setup.exe /CONFIGURATIONFILE='{{ VAR_INI_Path }}\ConfigurationFile.ini' {{ VAR_Extra_Command }}
+    when:
+      - SQLServer_image_out_path is not defined
+      - not VAR_Installer_Type == "CMP"
+
+    #Start-Process -FilePath "{{ SQLServer_image_out_path }}\\setup.exe" -ArgumentList "/CONFIGURATIONFILE='{{ VAR_INI_Path }}\\ConfigurationFile.ini" -Wait -NoNewWindow
+    #Start-Process -FilePath "{{ VAR_Installer_Drive_Letter }}\\setup.exe" -ArgumentList "/CONFIGURATIONFILE='{{ VAR_INI_Path }}\\ConfigurationFile.ini" -Wait -NoNewWindow
+
+
+
