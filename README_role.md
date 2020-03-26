@@ -17,7 +17,7 @@
 - 事前のチェック処理
 	- OSバージョン
 	- SQLServerインスタンスが既に存在するか
-- インストールの実施 
+- インストールの実施
 	- INIファイルを生成する
 	- インストール
 
@@ -25,9 +25,9 @@
 
 - 管理マシン(Ansibleサーバ)
  * Linux系OS（RHEL7）
- * Ansible バージョン 2.4 以上
- * Python バージョン 2.6 または2.7
- 
+ * Ansible バージョン 2.4 以上 (動作確認バージョン 2.4, 2.9)
+ * Python バージョン 2.x, 3.x  (動作確認バージョン 2.6, 2.7, 3.6)
+
 - 管理対象マシン(構築対象マシン)
  * Windows Server 2016
  * Framework バージョン 3.0 以上
@@ -48,13 +48,13 @@ Role の変数値について説明します。
 
 以下の変数は、実行時に、必ず指定します。  
 
-- SQLServer共通変数設定 
+- SQLServer共通変数設定
 	* VAR\_SQLServer\_OS\_Version：ターゲットホストのOSバージョン  
-		* 例： Windows Server 2016
+		* 例：Windows Server 2016
 	* VAR\_Tmp\_Folder：インストール用一時フォルダ  
-		* 例： C:\Temp\AnsibleforSQLServer  
+		* 例：C:\Temp\AnsibleforSQLServer  
 	* VAR\_Installer\_Type：インストール物件の類型を指定する  
-		* 例： ISO
+		* 例：ISO
 	* VAR\_Installer\_Unzip\_Path：展開されたインストール物件のフルパスを指定する  
 		* 例：E:\		 
 	* VAR\_AllowSkip\_SQLServerSWExist:  
@@ -64,6 +64,8 @@ Role の変数値について説明します。
 		* 例：true
 	* VAR\_INI\_Path：SQLServerインストール用INIファイルの格納パス  
 		* 例：C:\Temp\AnsibleforSQLServer  
+	* VAR\_Installer\_Name：SQLServerインストールパッケージのファイル名（ISOファイル）
+		* 例：SQLServer2016SP1-FullSlipstream-x64-JPN.iso
 </br>
 - SQLServerインストール Role変数
 	* VAR\_Extra\_Command：INIファイルに指定項目以外のオプションを設定しない場合、ここに指定してsetup.exeのコマンドラインに追加される。  
@@ -76,7 +78,7 @@ Role の変数値について説明します。
 	* VAR\_FEATURES: INIファイルFEATURES変数  
 		* 例：SQLENGINE  
 	* VAR\_SQLSYSADMINACCOUNTS: INIファイルSQLSYSADMINACCOUNTS変数  
-		* 例：Administrator  
+		* 例：Administrator
 
 ### Optional variables
 
@@ -97,7 +99,8 @@ Role の変数値について説明します。
   - VAR\_INSTALLSHAREDWOWDIR:        
   - VAR\_SQLTELSVCACCT:              
   - VAR\_SQLTELSVCSTARTUPTYPE:       
-  - VAR\_AGTSVCACCOUNT:              
+  - VAR\_AGTSVCACCOUNT:
+  - VAR\_AGTSVCPASSWORD            
   - VAR\_AGTSVCSTARTUPTYPE:          
   - VAR\_COMMFABRICPORT:             
   - VAR\_COMMFABRICNETWORKLEVEL:     
@@ -107,7 +110,8 @@ Role の変数値について説明します。
   - VAR\_FILESTREAMLEVEL:            
   - VAR\_ENABLERANU:                 
   - VAR\_SQLCOLLATION:               
-  - VAR\_SQLSVCACCOUNT:              
+  - VAR\_SQLSVCACCOUNT:
+  - VAR\_SQLSVCPASSWORD:         
   - VAR\_SQLSVCINSTANTFILEINIT:      
   - VAR\_SQLTEMPDBFILECOUNT:       
   - VAR\_SQLTEMPDBFILESIZE:        
@@ -143,7 +147,7 @@ Role の変数値について説明します。
 
 * 変数関連  
  * 必須変数は必ず指定してください。  
- * INIファイルの変数にtrue / falseがある場合は、 ""（二重引用符）を使用してブール変数としてエスケープされないようにします。 
+ * INIファイルの変数にtrue / falseがある場合は、 ""（二重引用符）を使用してブール変数としてエスケープされないようにします。
  * 変数VAR\_SQLServer\_OS\_Versionの書き方は：Windows Server 2016 大小文字区別、半角スペースあり。OSバージョンを検証する時、完全一致のチェックではなく、部分一致となります。つまり、実際のOSはWindows Server 2016、変数VAR\_SQLServer\_OS\_VersionにWindows Serverが設定されても一致する結論となります。ただ、Win Serverのような値は一致しないと判断されます。  
  * SqlServerのサイドルールに準拠する必要があるたとえば、インスタンス名は16文字に制限されています。この間違いインストール時のみ反映されます，Ansibleチェックしません。  
  * VAR\_Installer\_TypeがISOあるいはCMPの場合、Role：SQLServerインストールのみ実施する時、AnsibleでISOファイルあるいはCMPファイルを展開していないため、手動的にそのISOファイルあるいはCMPファイルを展開する必要。そのとき、展開されたフルパスを事前に設定する必要（例：E:\）。VAR\_Installer\_TypeがPATHの場合、直接に展開されたインストール物件のフルパスを設定してください。  
@@ -178,7 +182,7 @@ Role の変数値について説明します。
       * SqlServer_install/
       * SqlServer_preinstall/
   - sqlserverinstall.yml
-  - AllVariable.yml 
+  - AllVariable.yml
   - hosts
 ~~~
 
